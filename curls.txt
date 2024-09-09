@@ -1,0 +1,6 @@
+curl -X POST http://localhost:8080/register -d '{"user_name": "test_user", "password": "pw"}'
+curl -X GET http://localhost:8080/login -d '{"user_name": "test_user", "password": "pw"}'
+curl -X POST http://localhost:8080/post -d '{"token": "test_user_token", "content": "Legendary post"}'
+curl -X GET http://localhost:8080/posts -d '{"token": "test_user_token"}'
+curl -X POST http://localhost:8080/post -d '{"token": "test_user_token", "content": "Second post!!!! wow"}'
+curl -X GET http://localhost:8080/posts -d '{"token": "test_user_token"}'
