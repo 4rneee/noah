@@ -8,5 +8,5 @@ type User struct {
 	Password    []byte    `json:"-" gorm:"type:BINARY(60)"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-    Posts       []Post    `json:"posts" gorm:"foreignKey:UserName;references:Name"`
+	Posts       []Post    `json:"posts" gorm:"foreignKey:UserName;references:Name"`
 }

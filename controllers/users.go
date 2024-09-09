@@ -41,7 +41,6 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// check if username is taken
 	var count int64
 	models.DB.
 		Table("users").
@@ -71,7 +70,7 @@ func Register(c *gin.Context) {
 	}
 
 	insert := models.User{
-		Name:    sanetized_name,
+		Name:        sanetized_name,
 		DisplayName: sanetized_name, // default name, can be updated later
 		Password:    hash,
 		CreatedAt:   time.Time{}, // will be set by the DB
@@ -134,7 +133,7 @@ func Login(c *gin.Context) {
 	}
 
 	// TODO: generate and store token
-    token := fmt.Sprintf("%v_token", user.Name)
+	token := fmt.Sprintf("%v_token", user.Name)
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
