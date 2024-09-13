@@ -64,7 +64,11 @@ func GetPosts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"posts": posts})
+	c.HTML(http.StatusOK, "posts.tmpl", gin.H{
+		"title": "Main website",
+	})
+	return
+	// c.JSON(http.StatusOK, gin.H{"posts": posts})
 }
 
 // <=============== POST /post ===============>
