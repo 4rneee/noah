@@ -11,6 +11,7 @@ func main() {
 	models.ConnectDatabase()
 
 	r := gin.Default()
+	r.LoadHTMLGlob("templates/*")
 
 	r.POST("/register", controllers.Register)
 	r.GET("/login", controllers.Login)
