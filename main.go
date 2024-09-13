@@ -13,6 +13,7 @@ func main() {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 
+	r.GET("/register", controllers.RegisterHTML)
 	r.POST("/register", controllers.Register)
 	r.GET("/login", controllers.Login)
 	r.GET("/posts", controllers.GetPosts)
