@@ -26,20 +26,30 @@ func validPassword(password string) bool {
 	return len(password) > 0 && len(password) <= 72
 }
 
+// <=============== GET /register ===============>
+func RegisterHTML(c *gin.Context) {
+	c.HTML(http.StatusOK, "register.tmpl", gin.H{})
+}
+
 // <=============== POST /register ===============>
 type RegisterUserInput struct {
-	UserName string `json:"user_name" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	UserName       string `form:"username" binding:"required"`
+	Password       string `form:"password" binding:"required"`
+	GlobalPassword string `form:"global_password" binding:"required"`
 }
 
 func Register(c *gin.Context) {
 	var input RegisterUserInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBind(&input); err != nil {
+		c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+			"error": "Invalid request",
+		})
 		c.Error(err)
 		return
 	}
+
+	// TODO: check global password. Propably store global password in env variable
 
 	var count int64
 	models.DB.
@@ -47,24 +57,32 @@ func Register(c *gin.Context) {
 		Where("name = ?", input.UserName).
 		Count(&count)
 	if count > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "The username has already been taken."})
+		c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+			"error": "The username has already been taken.",
+		})
 		return
 	}
 
 	sanetized_name, valid_name := sanetizeUserName(input.UserName)
 	if !valid_name {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username"})
+		c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+			"error": "Invalid username",
+		})
 		return
 	}
 
 	if !validPassword(input.Password) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid password"})
+		c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+			"error": "Invalid password",
+		})
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.HTML(http.StatusInternalServerError, "register.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
 		c.Error(err)
 		return
 	}
@@ -83,12 +101,14 @@ func Register(c *gin.Context) {
 		Error
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.HTML(http.StatusInternalServerError, "register.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
 		c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"user": insert})
+	c.Redirect(http.StatusPermanentRedirect, "/login")
 }
 
 // <=============== GET /login ===============>
