@@ -113,7 +113,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusPermanentRedirect, "/login")
+	c.Redirect(http.StatusFound, "/login")
 }
 
 // <=============== GET /login ===============>
@@ -160,6 +160,7 @@ func Login(c *gin.Context) {
 	// TODO: generate and store token
 	token := fmt.Sprintf("%v_token", user.Name)
 	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.Redirect(http.StatusFound, "/posts")
 }
 
 // TODO: update user fields such as display name
