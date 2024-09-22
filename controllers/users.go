@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -49,7 +50,11 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// TODO: check global password. Propably store global password in env variable
+    if input.GlobalPassword != os.Getenv("GLOBAL_PASSWORD") {
+        c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+            "error": "Invalid global password",
+        })
+    }
 
 	var count int64
 	models.DB.
