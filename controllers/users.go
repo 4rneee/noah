@@ -1,14 +1,16 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/4rneee/noah-updater/models"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -49,7 +51,12 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// TODO: check global password. Propably store global password in env variable
+    if input.GlobalPassword != os.Getenv("GLOBAL_PASSWORD") {
+        c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+            "error": "Invalid global password",
+        })
+        return
+    }
 
 	var count int64
 	models.DB.
@@ -108,20 +115,27 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusPermanentRedirect, "/login")
+	c.Redirect(http.StatusFound, "/login")
 }
 
 // <=============== GET /login ===============>
+func LoginHTML(c *gin.Context) {
+	c.HTML(http.StatusOK, "login.tmpl", gin.H{})
+}
+
+// <=============== POST /login ===============>
 type LoginUserInput struct {
-	UserName string `json:"user_name" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	UserName string `form:"username" binding:"required"`
+	Password string `form:"password" binding:"required"`
 }
 
 func Login(c *gin.Context) {
 	var input LoginUserInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBind(&input); err != nil {
+		c.HTML(http.StatusBadRequest, "login.tmpl", gin.H{
+			"error": "Invalid request",
+		})
 		c.Error(err)
 		return
 	}
@@ -134,27 +148,50 @@ func Login(c *gin.Context) {
 		Error
 
 	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username or password"})
+		c.HTML(http.StatusBadRequest, "login.tmpl", gin.H{
+			"error": "Invalid username or password",
+		})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.HTML(http.StatusInternalServerError, "login.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
 		c.Error(err)
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword(user.Password, []byte(input.Password))
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username or password"})
+		c.HTML(http.StatusBadRequest, "login.tmpl", gin.H{
+			"error": "Invalid username or password",
+		})
 		return
 	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.HTML(http.StatusInternalServerError, "login.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
 		c.Error(err)
 		return
 	}
 
-	// TODO: generate and store token
-	token := fmt.Sprintf("%v_token", user.Name)
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	session := sessions.Default(c)
+
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"username": input.UserName,
+		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+	}).SignedString([]byte(os.Getenv("SECRET")))
+
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "login.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
+		c.Error(err)
+		return
+	}
+
+	session.Set("token", token)
+	session.Save()
+	c.Redirect(http.StatusFound, "/posts")
 }
 
 // TODO: update user fields such as display name
