@@ -3,7 +3,7 @@
 		<title>Create Post</title>
 		<style>
 			input[type="text"], textarea {
-				width: 80%;
+				width: 100%;
 				padding: 10px;
 				margin: 8px 0;
 				display: inline-block;
@@ -14,7 +14,7 @@
 			}
 
 			input[type="submit"] {
-				width: 80%;
+				width: 100%;
 				background-color: #4CAF50;
 				color: white;
 				padding: 10px;
@@ -26,32 +26,35 @@
 				background-color: #45a049;
 			}
 
-			/* Style the container */
 			.container {
-				display: flex;
-				justify-content: center;
+				width: 80%;
+				margin: 0 auto;
 				border-radius: 5px;
-				padding: 20px;
 			}
+
+            .error {
+                color: red;
+                text-align: center;
+            }
 		</style>
 	</head>
 	<body>
 		<h1>Create Post</h1>
 
 		<div class="container">
-			<form action="/post" method="POST">
+            {{if .error}}
+                <div class="error">{{.error}}</div>
+            {{end}}
+
+			<form action="/create" method="POST">
 				<div class="row">
-					<div class="col-75">
-						<input type="text" id="title" name="title" placeholder="Title">
-					</div>
+					<input type="text" id="title" name="title" placeholder="Title">
 				</div>
 				<div class="row">
-					<div class="col-75">
-						<textarea id="content" name="content" placeholder="Was los?" style="height:200px"></textarea>
-					</div>
+					<textarea id="content" name="content" placeholder="Was los?" style="height:200px"></textarea>
 				</div>
 				<div class="row">
-					<input type="submit" value="Submit">
+					<input type="submit" value="Post">
 				</div>
 			</form>
 		</div>
