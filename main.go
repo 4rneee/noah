@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/4rneee/noah-updater/controllers"
 	"github.com/4rneee/noah-updater/middlewares"
@@ -13,6 +16,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
+
+func formatAsDate(t time.Time) string {
+	year, month, day := t.Date()
+	return fmt.Sprintf("%02d.%02d.%04d", day, month, year)
+}
 
 func main() {
 	err := godotenv.Load()
@@ -24,6 +32,9 @@ func main() {
 	models.ConnectDatabase()
 
 	r := gin.Default()
+	r.SetFuncMap(template.FuncMap{
+		"formatAsDate": formatAsDate,
+	})
 	r.LoadHTMLGlob("templates/*")
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
