@@ -28,7 +28,7 @@ type GetPostsInput struct {
 }
 
 func GetPosts(c *gin.Context) {
-	// var input GetPostsInput
+	var input GetPostsInput
 
 	// if err := c.ShouldBindJSON(&input); err != nil {
 	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -36,7 +36,7 @@ func GetPosts(c *gin.Context) {
 	// 	return
 	// }
 
-	// // TODO: validate token
+	// TODO: validate token
 	// _, valid_token := usernameFromToken(input.Token)
 
 	// if !valid_token {
@@ -44,31 +44,31 @@ func GetPosts(c *gin.Context) {
 	// 	return
 	// }
 
-	// if input.Page == 0 {
-	// 	input.Page = 1
-	// }
-	// if input.PageSize == 0 {
-	// 	input.PageSize = 25
-	// }
+	if input.Page == 0 {
+		input.Page = 1
+	}
+	if input.PageSize == 0 {
+		input.PageSize = 25
+	}
 
-	// var posts []models.Post
-	// err := models.DB.
-	// 	Order("created_at desc").
-	// 	Offset(int(input.PageSize * (input.Page - 1))).
-	// 	Limit(int(input.PageSize)).
-	// 	Find(&posts).
-	// 	Error
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
-	// 	c.Error(err)
-	// 	return
-	// }
+	var posts []models.Post
+	err := models.DB.
+		Order("created_at desc").
+		Offset(int(input.PageSize * (input.Page - 1))).
+		Limit(int(input.PageSize)).
+		Find(&posts).
+		Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.Error(err)
+		return
+	}
 
 	c.HTML(http.StatusOK, "posts.tmpl", gin.H{
-		"title": "Main website",
+		"posts": posts,
 	})
+
 	return
-	// c.JSON(http.StatusOK, gin.H{"posts": posts})
 }
 
 // <=============== POST /post ===============>

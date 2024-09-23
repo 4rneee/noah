@@ -1,6 +1,48 @@
 <html>
-	<h1>
-		{{ .title }}
-	</h1>
+	<head>
+		<title>Posts</title>
+		<style>
+			.post-box {
+				width: 80%;
+				background: white;
+				padding: 20px;
+				margin: 0 auto 20px;
+				border: 2px solid #ddd;
+				border-radius: 5px;
+			}
+			.post-box .author {
+				font-weight: bold;
+				margin-bottom: 6px;
+			}
+			.post-box .date {
+				color: #888;
+				font-size: 14px;
+			}
+			.post-box .content {
+				margin-top: 10px;
+				font-size: 16px;
+				line-height: 1.6;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>
+			Posts
+		</h1>
+
+		{{ range .posts }}
+			<div class="post-box">
+				<div class="author">
+					{{ .UserName }}
+				</div>
+				<div class="date">
+					{{ .CreatedAt | formatAsDate }}
+				</div>
+				<div class="content">
+					{{ .Content }}
+				</div>
+			</div>
+		{{ end }}
+	</body>
 </html>
 
