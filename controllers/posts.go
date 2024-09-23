@@ -17,7 +17,7 @@ type GetPostsInput struct {
 func GetPosts(c *gin.Context) {
 	var input GetPostsInput
 
-    // TODO: maybe get page and page size from url params
+	// TODO: maybe get page and page size from url params
 
 	if input.Page == 0 {
 		input.Page = 1
@@ -45,8 +45,6 @@ func GetPosts(c *gin.Context) {
 
 	return
 }
-
-
 
 // <=============== GET /create ===============>
 func CreateHTML(c *gin.Context) {
