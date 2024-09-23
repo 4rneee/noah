@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/4rneee/noah-updater/controllers"
@@ -14,11 +15,11 @@ import (
 )
 
 func main() {
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading .env file")
-        return
-    }
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+		return
+	}
 
 	models.ConnectDatabase()
 
@@ -26,7 +27,10 @@ func main() {
 	r.LoadHTMLGlob("templates/*")
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
-	store.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // expire in a day
+	store.Options(sessions.Options{
+        MaxAge: 60 * 60 * 24,
+        SameSite: http.SameSiteStrictMode,
+    })
 	r.Use(sessions.Sessions("login", store))
 
 	r.GET("/register", controllers.RegisterHTML)
