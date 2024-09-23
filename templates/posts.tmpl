@@ -2,6 +2,19 @@
 	<head>
 		<title>Posts</title>
 		<style>
+			.container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 10px;
+			}
+			.right-align {
+				padding: 10px 20px;
+			}
+			.clearfix {
+				overflow: auto;
+			}
+
 			.post-box {
 				width: 80%;
 				background: white;
@@ -26,9 +39,10 @@
 		</style>
 	</head>
 	<body>
-		<h1>
-			Posts
-		</h1>
+		<div class="container">
+			<h1>Posts</h1>
+			<button class="right-align" onclick="location.href='/create'">Create new Post</button>
+		</div>
 
 		{{ range .posts }}
 			<div class="post-box">

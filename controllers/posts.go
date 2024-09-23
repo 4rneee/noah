@@ -112,3 +112,7 @@ func CreatePost(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"post": post})
 }
+
+func CreateHTML(c *gin.Context) {
+	c.HTML(http.StatusOK, "create.tmpl", gin.H{})
+}

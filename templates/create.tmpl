@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>Create Post</title>
+		<style>
+			input[type="text"], textarea {
+				width: 80%;
+				padding: 10px;
+				margin: 8px 0;
+				display: inline-block;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				box-sizing: border-box;
+				resize: vertical;
+			}
+
+			input[type="submit"] {
+				width: 80%;
+				background-color: #4CAF50;
+				color: white;
+				padding: 10px;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+			input[type="submit"]:hover {
+				background-color: #45a049;
+			}
+
+			/* Style the container */
+			.container {
+				display: flex;
+				justify-content: center;
+				border-radius: 5px;
+				padding: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Create Post</h1>
+
+		<div class="container">
+			<form action="/post" method="POST">
+				<div class="row">
+					<div class="col-75">
+						<input type="text" id="title" name="title" placeholder="Title">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-75">
+						<textarea id="content" name="content" placeholder="Was los?" style="height:200px"></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<input type="submit" value="Submit">
+				</div>
+			</form>
+		</div>
+	</body>
+</html>
+
