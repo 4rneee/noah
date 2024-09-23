@@ -2,23 +2,10 @@ package controllers
 
 import (
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/4rneee/noah-updater/models"
 	"github.com/gin-gonic/gin"
 )
-
-func usernameFromToken(token string) (string, bool) {
-	idx := strings.LastIndex(token, "_")
-	if idx == -1 {
-		return "", false
-	}
-	if token[idx+1:] != "token" {
-		return "", false
-	}
-	return token[:idx], true
-}
 
 // <=============== GET /posts ===============>
 type GetPostsInput struct {
@@ -30,19 +17,7 @@ type GetPostsInput struct {
 func GetPosts(c *gin.Context) {
 	var input GetPostsInput
 
-	// if err := c.ShouldBindJSON(&input); err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	// 	c.Error(err)
-	// 	return
-	// }
-
-	// TODO: validate token
-	// _, valid_token := usernameFromToken(input.Token)
-
-	// if !valid_token {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
-	// 	return
-	// }
+    // TODO: maybe get page and page size from url params
 
 	if input.Page == 0 {
 		input.Page = 1
@@ -71,33 +46,51 @@ func GetPosts(c *gin.Context) {
 	return
 }
 
-// <=============== POST /post ===============>
+
+
+// <=============== GET /create ===============>
+func CreateHTML(c *gin.Context) {
+	c.HTML(http.StatusOK, "create.tmpl", gin.H{})
+}
+
+// <=============== POST /create ===============>
 type PostInput struct {
-	Token   string `json:"token" binding:"required"`
-	Content string `json:"content" binding:"required"`
+	Title   string `form:"title" binding:"required"`
+	Content string `form:"content" binding:"required"`
 }
 
 func CreatePost(c *gin.Context) {
 	var input PostInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBind(&input); err != nil {
+		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
+			"error": "Invalid request",
+		})
 		c.Error(err)
 		return
 	}
 
-	user_name, valid_token := usernameFromToken(input.Token)
-	if !valid_token {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
+	// the current_user variable should exist and be of type models.User
+	cur_user, exists := c.Get("current_user")
+	if !exists {
+		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
+		return
+	}
+
+	user, ok := cur_user.(models.User)
+	if !ok {
+		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
 		return
 	}
 
 	post := models.Post{
-		ID:        0,           // will be set by the DB
-		CreatedAt: time.Time{}, // will be set by the DB
-		UpdatedAt: time.Time{}, // will be set by the DB
-		UserName:  user_name,
-		Content:   input.Content,
+		UserName: user.Name,
+		Title:    input.Title,
+		Content:  input.Content,
 	}
 
 	err := models.DB.
@@ -105,14 +98,12 @@ func CreatePost(c *gin.Context) {
 		Error
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
+			"error": "Internal Server Error",
+		})
 		c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"post": post})
-}
-
-func CreateHTML(c *gin.Context) {
-	c.HTML(http.StatusOK, "create.tmpl", gin.H{})
+	c.Redirect(http.StatusFound, "/posts")
 }
