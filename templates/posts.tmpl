@@ -37,6 +37,13 @@
 				line-height: 1.6;
                 white-space: pre-line;
 			}
+            .post-box .image {
+                padding: 1px;
+            }
+            .post-box .image img {
+                max-width: 100%;
+                max-height: 100%;
+            }
 		</style>
 	</head>
 	<body>
@@ -57,6 +64,13 @@
 				<div class="content">
 					{{ .Content }}
 				</div>
+                {{ range .Images }}
+                    <div class="image">
+                        <a href="/uploads/{{ . }}" target="_blank">
+                            <img src="/uploads/{{ . }}">
+                        </a>
+                    </div>
+                {{ end }}
 			</div>
 		{{ end }}
 	</body>

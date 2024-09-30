@@ -36,6 +36,7 @@ func main() {
 		"formatAsDate": formatAsDate,
 	})
 	r.LoadHTMLGlob("templates/*")
+    r.Static("/uploads", "./uploads")
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
 	store.Options(sessions.Options{
