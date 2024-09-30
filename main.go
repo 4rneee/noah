@@ -49,7 +49,8 @@ func main() {
 	r.GET("/login", controllers.LoginHTML)
 	r.POST("/login", controllers.Login)
 	r.GET("/posts", middlewares.CheckAuth, controllers.GetPosts)
-	r.POST("/post", middlewares.CheckAuth, controllers.CreatePost)
+	r.GET("/create", middlewares.CheckAuth, controllers.CreateHTML)
+	r.POST("/create", middlewares.CheckAuth, controllers.CreatePost)
 
 	r.Run() // automatically uses the 'PORT' env variable
 }

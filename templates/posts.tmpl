@@ -2,6 +2,19 @@
 	<head>
 		<title>Posts</title>
 		<style>
+			.container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 10px;
+			}
+			.right-align {
+				padding: 10px 20px;
+			}
+			.clearfix {
+				overflow: auto;
+			}
+
 			.post-box {
 				width: 80%;
 				background: white;
@@ -22,13 +35,15 @@
 				margin-top: 10px;
 				font-size: 16px;
 				line-height: 1.6;
+                white-space: pre-line;
 			}
 		</style>
 	</head>
 	<body>
-		<h1>
-			Posts
-		</h1>
+		<div class="container">
+			<h1>Posts</h1>
+			<div class="right-align"><a href=/create>Create new Post</a></div>
+		</div>
 
 		{{ range .posts }}
 			<div class="post-box">
@@ -38,6 +53,7 @@
 				<div class="date">
 					{{ .CreatedAt | formatAsDate }}
 				</div>
+                <h2>{{ .Title }}</h2>
 				<div class="content">
 					{{ .Content }}
 				</div>
