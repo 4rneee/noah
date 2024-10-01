@@ -51,6 +51,7 @@ func main() {
 	r.GET("/posts", middlewares.CheckAuth, controllers.GetPosts)
 	r.GET("/create", middlewares.CheckAuth, controllers.CreateHTML)
 	r.POST("/create", middlewares.CheckAuth, controllers.CreatePost)
+    r.GET("/uploads/:filename", middlewares.CheckAuth, controllers.Uploads)
 
 	r.Run() // automatically uses the 'PORT' env variable
 }

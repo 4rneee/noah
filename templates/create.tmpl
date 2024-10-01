@@ -49,13 +49,18 @@
                 <div class="error">{{.error}}</div>
             {{end}}
 
-			<form action="/create" method="POST">
+			<form action="/create" method="POST", enctype="multipart/form-data">
 				<div class="row">
 					<input type="text" id="title" name="title" placeholder="Title">
 				</div>
 				<div class="row">
 					<textarea id="content" name="content" placeholder="Was los?" style="height:200px"></textarea>
 				</div>
+				<div class="row">
+                    <label for="images">Images:</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple>
+                </div>
+                <br></br>
 				<div class="row">
 					<input type="submit" value="Post">
 				</div>
