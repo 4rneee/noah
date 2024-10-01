@@ -137,3 +137,10 @@ func CreatePost(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, "/posts")
 }
+
+// <=============== GET /uploads/:filename ===============>
+func Uploads(c *gin.Context) {
+    file_name := filepath.Clean(c.Param("filename"))
+    path := filepath.Join("uploads", file_name)
+    c.File(path)
+}
