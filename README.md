@@ -5,4 +5,3 @@ Namensvorschläge sind willkommen!
 ```sh
 go run main.go
 ```
-`curls.txt` contains example commands to test the current api.
