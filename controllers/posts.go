@@ -11,29 +11,12 @@ import (
 )
 
 // <=============== GET /posts ===============>
-type GetPostsInput struct {
-	Token    string `json:"token" binding:"required"`
-	Page     uint   `json:"page"`
-	PageSize uint   `json:"page_size"`
-}
-
 func GetPosts(c *gin.Context) {
-	var input GetPostsInput
-
-	// TODO: maybe get page and page size from url params
-
-	if input.Page == 0 {
-		input.Page = 1
-	}
-	if input.PageSize == 0 {
-		input.PageSize = 25
-	}
+	// TODO: add a page system so that we dont always return all posts
 
 	var posts []models.Post
 	err := models.DB.
 		Order("created_at desc").
-		Offset(int(input.PageSize * (input.Page - 1))).
-		Limit(int(input.PageSize)).
 		Find(&posts).
 		Error
 	if err != nil {
