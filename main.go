@@ -44,6 +44,9 @@ func main() {
     })
 	r.Use(sessions.Sessions("login", store))
 
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/posts")
+	})
 	r.GET("/register", controllers.RegisterHTML)
 	r.POST("/register", controllers.Register)
 	r.GET("/login", controllers.LoginHTML)
