@@ -39,11 +39,14 @@ func main() {
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
 	store.Options(sessions.Options{
-        MaxAge: 60 * 60 * 24,
-        SameSite: http.SameSiteStrictMode,
-    })
+		MaxAge:   60 * 60 * 24,
+		SameSite: http.SameSiteStrictMode,
+	})
 	r.Use(sessions.Sessions("login", store))
 
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusPermanentRedirect, "/posts")
+	})
 	r.GET("/register", controllers.RegisterHTML)
 	r.POST("/register", controllers.Register)
 	r.GET("/login", controllers.LoginHTML)
@@ -51,7 +54,7 @@ func main() {
 	r.GET("/posts", middlewares.CheckAuth, controllers.GetPosts)
 	r.GET("/create", middlewares.CheckAuth, controllers.CreateHTML)
 	r.POST("/create", middlewares.CheckAuth, controllers.CreatePost)
-    r.GET("/uploads/:filename", middlewares.CheckAuth, controllers.Uploads)
+	r.GET("/uploads/:filename", middlewares.CheckAuth, controllers.Uploads)
 
 	r.Run() // automatically uses the 'PORT' env variable
 }
