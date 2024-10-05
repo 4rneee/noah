@@ -51,12 +51,12 @@ func Register(c *gin.Context) {
 		return
 	}
 
-    if input.GlobalPassword != os.Getenv("GLOBAL_PASSWORD") {
-        c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
-            "error": "Invalid global password",
-        })
-        return
-    }
+	if input.GlobalPassword != os.Getenv("GLOBAL_PASSWORD") {
+		c.HTML(http.StatusBadRequest, "register.tmpl", gin.H{
+			"error": "Invalid global password",
+		})
+		return
+	}
 
 	var count int64
 	models.DB.
@@ -178,7 +178,7 @@ func Login(c *gin.Context) {
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": input.UserName,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"exp":      time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 days
 	}).SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
