@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<title>Posts</title>
+        <link rel="stylesheet" href="navbar.css">
 		<style>
 			.container {
 				display: flex;
@@ -47,11 +48,15 @@
 		</style>
 	</head>
 	<body>
-		<div class="container">
-			<h1>Posts</h1>
-			<div class="right-align"><a href=/create>Create new Post</a></div>
-		</div>
-
+        <nav class="navbar">
+            <div class="nav-left">
+                <a class="active" href="/posts">Posts</a>
+                <a href="/create">Create Posts</a>
+            </div>
+            <div class="nav-right">
+                <a href="/logout">Logout</a>
+            </div>
+        </nav>
 		{{ range .posts }}
 			<div class="post-box">
 				<div class="author">

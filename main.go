@@ -35,6 +35,7 @@ func main() {
 	r.SetFuncMap(template.FuncMap{
 		"formatAsDate": formatAsDate,
 	})
+    r.StaticFile("navbar.css", "./static/navbar.css")
 	r.LoadHTMLGlob("templates/*")
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
@@ -51,6 +52,7 @@ func main() {
 	r.POST("/register", controllers.Register)
 	r.GET("/login", controllers.LoginHTML)
 	r.POST("/login", controllers.Login)
+	r.GET("/logout", controllers.Logout)
 	r.GET("/posts", middlewares.CheckAuth, controllers.GetPosts)
 	r.GET("/create", middlewares.CheckAuth, controllers.CreateHTML)
 	r.POST("/create", middlewares.CheckAuth, controllers.CreatePost)
