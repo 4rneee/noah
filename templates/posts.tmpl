@@ -42,7 +42,7 @@
             }
             .post-box .image img {
                 max-width: 100%;
-                max-height: 100%;
+                max-height: 65vh;
             }
 		</style>
 	</head>
@@ -61,9 +61,7 @@
 					{{ .CreatedAt | formatAsDate }}
 				</div>
                 <h2>{{ .Title }}</h2>
-				<div class="content">
-					{{ .Content }}
-				</div>
+				<div class="content">{{ .Content }}</div>
                 {{ range .Images }}
                     <div class="image">
                         <a href="/uploads/{{ . }}" target="_blank">
