@@ -194,4 +194,12 @@ func Login(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/posts")
 }
 
+// <=============== GET /logout ===============>
+func Logout(c *gin.Context) {
+	session := sessions.Default(c)
+    session.Delete("token")
+    session.Save()
+    c.Redirect(http.StatusTemporaryRedirect, "/login")
+}
+
 // TODO: update user fields such as display name
