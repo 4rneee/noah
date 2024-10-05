@@ -1,0 +1,35 @@
+body {
+    padding-top: 60px;
+}
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.nav-left, .nav-right {
+    display: flex;
+}
+
+.nav-left a, .nav-right a {
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    padding: 14px 16px;
+    display: block;
+}
+
+.nav-left a:hover, .nav-right a:hover {
+    background-color: #575757;
+}
+
+.navbar .active {
+    background-color: #4422f2;
+}
+

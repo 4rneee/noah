@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<title>Create Post</title>
+        <link rel="stylesheet" href="navbar.css">
 		<style>
 			input[type="text"], textarea {
 				width: 100%;
@@ -42,7 +43,15 @@
 		</style>
 	</head>
 	<body>
-		<h1>Create Post</h1>
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="/posts">Posts</a>
+                <a class="active" href="/create">Create Posts</a>
+            </div>
+            <div class="nav-right">
+                <a href="/logout">Logout</a>
+            </div>
+        </nav>
 
 		<div class="container">
             {{if .error}}
@@ -65,9 +74,6 @@
 					<input type="submit" value="Post">
 				</div>
 			</form>
-            <div class="back">
-                <a href="/posts">Back</a>
-            </div>
 		</div>
 	</body>
 </html>

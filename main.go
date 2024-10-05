@@ -35,6 +35,7 @@ func main() {
 	r.SetFuncMap(template.FuncMap{
 		"formatAsDate": formatAsDate,
 	})
+    r.StaticFile("navbar.css", "./static/navbar.css")
 	r.LoadHTMLGlob("templates/*")
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
