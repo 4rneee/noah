@@ -100,7 +100,6 @@ func Register(c *gin.Context) {
 		Password:    hash,
 		CreatedAt:   time.Time{}, // will be set by the DB
 		UpdatedAt:   time.Time{}, // will be set by the DB
-		Posts:       []models.Post{},
 	}
 
 	err = models.DB.
