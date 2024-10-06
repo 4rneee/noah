@@ -35,7 +35,7 @@ func main() {
 	r.SetFuncMap(template.FuncMap{
 		"formatAsDate": formatAsDate,
 	})
-    r.StaticFile("navbar.css", "./static/navbar.css")
+	r.StaticFile("navbar.css", "./static/navbar.css")
 	r.LoadHTMLGlob("templates/*")
 
 	store := cookie.NewStore([]byte(os.Getenv("SECRET")))
@@ -57,6 +57,8 @@ func main() {
 	r.GET("/create", middlewares.CheckAuth, controllers.CreateHTML)
 	r.POST("/create", middlewares.CheckAuth, controllers.CreatePost)
 	r.GET("/uploads/:filename", middlewares.CheckAuth, controllers.Uploads)
+	r.GET("/post/:id", middlewares.CheckAuth, controllers.GetPost)
+	r.POST("/post/:id", middlewares.CheckAuth, controllers.PostComment)
 
 	r.Run() // automatically uses the 'PORT' env variable
 }

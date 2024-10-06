@@ -5,14 +5,13 @@ import (
 	"time"
 )
 
-type Post struct {
+type Comment struct {
 	ID        uint                        `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time                   `json:"created_at"`
 	UpdatedAt time.Time                   `json:"updated_at"`
-	UserName  string                      `json:"user_name" gorm:"index"`
+	PostID    uint                        `json:"post_id"`
+	UserName  string                      `json:"user_name"`
 	User      User                        `json:"-" gorm:"foreignKey:UserName;references:Name;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	Title     string                      `json:"title"`
 	Content   string                      `json:"content"`
 	Images    datatypes.JSONSlice[string] `json:"images"`
-	Comments  []Comment                   `json:"comments" gorm:"foreignKey:PostID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }

@@ -1,0 +1,173 @@
+<html>
+	<head>
+		<title>{{.post.Title }}</title>
+        <link rel="stylesheet" href="/navbar.css">
+		<style>
+			.post-box {
+				width: 80%;
+				background: white;
+				padding: 20px;
+				margin: 0 auto 20px;
+				border: 2px solid #ddd;
+				border-radius: 5px;
+			}
+			.post-box .author {
+				font-weight: bold;
+				margin-bottom: 6px;
+			}
+			.post-box .info {
+				color: #888;
+				font-size: 14px;
+			}
+			.post-box .content {
+				margin-top: 10px;
+				font-size: 16px;
+				line-height: 1.6;
+                white-space: pre-line;
+			}
+            .post-box .image {
+                padding: 1px;
+            }
+            .post-box .image img {
+                max-width: 100%;
+                max-height: 65vh;
+            }
+
+			.comment-box {
+				width: 80%;
+				background: white;
+				padding: 20px;
+				margin: 0 auto 5px;
+				border: 1px solid #ddd;
+				border-radius: 5px;
+			}
+			.comment-box .author {
+				font-weight: bold;
+				margin-bottom: 6px;
+			}
+			.comment-box .info {
+				color: #888;
+				font-size: 14px;
+			}
+			.comment-box .content {
+				margin-top: 10px;
+				font-size: 16px;
+				line-height: 1.6;
+                white-space: pre-line;
+			}
+            .comment-box .image {
+                padding: 1px;
+            }
+            .comment-box .image img {
+                max-width: 100%;
+                max-height: 65vh;
+            }
+
+
+			textarea {
+				width: 100%;
+				padding: 10px;
+				margin: 8px 0;
+				display: inline-block;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				box-sizing: border-box;
+				resize: vertical;
+			}
+
+			.comment-input {
+				width: 80%;
+				margin: 0 auto;
+				border-radius: 5px;
+			}
+			input[type="submit"] {
+				width: 100%;
+				background-color: #4CAF50;
+				color: white;
+				padding: 10px;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+			}
+			input[type="submit"]:hover {
+				background-color: #45a049;
+			}
+            .error {
+                color: red;
+                text-align: center;
+            }
+		</style>
+	</head>
+	<body>
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="/posts">Posts</a>
+                <a href="/create">Create Posts</a>
+            </div>
+            <div class="nav-right">
+                <a href="/logout">Logout</a>
+            </div>
+        </nav>
+        {{ with .post }}
+        <div class="post-box">
+            <div class="author">
+                {{ .UserName }}
+            </div>
+            <div class="info">
+                {{ .CreatedAt | formatAsDate }}
+                <br>
+                {{ .Comments | len }} comments
+            </div>
+            <h2>{{ .Title }}</h2>
+            <div class="content">{{ .Content }}</div>
+            {{ range .Images }}
+                <div class="image">
+                    <a href="/uploads/{{ . }}" target="_blank">
+                        <img src="/uploads/{{ . }}">
+                    </a>
+                </div>
+            {{ end }}
+        </div>
+        <h4 style="text-align:center">Comments</h4>
+        {{ range .Comments }}
+            <div class="comment-box">
+                <div class="author">
+                    {{ .UserName }}
+                </div>
+                <div class="info">
+                    {{ .CreatedAt | formatAsDate }}
+                </div>
+                <div class="content">{{ .Content }}</div>
+                {{ range .Images }}
+                    <div class="image">
+                        <a href="/uploads/{{ . }}" target="_blank">
+                            <img src="/uploads/{{ . }}">
+                        </a>
+                    </div>
+                {{ end }}
+            </div>
+        {{ end }}
+        {{ end }}
+
+
+		<div class="comment-input">
+            {{  if .error  }}
+                <div class="error">{{  .error  }}</div>
+            {{  end  }}
+			<form action="/post/{{ .post.ID }}" method="POST", enctype="multipart/form-data">
+				<div class="row">
+					<textarea id="content" name="content" spaceholder="Add a comment" style="height:100px"></textarea>
+				</div>
+				<div class="row">
+                    <label for="images">Images:</label>
+                    <input type="file" id="images" name="images" accept="image/*" multiple>
+                </div>
+                <br>
+				<div class="row">
+					<input type="submit" value="Comment">
+				</div>
+			</form>
+		</div>
+	</body>
+</html>
+
