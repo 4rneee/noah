@@ -74,8 +74,6 @@ func GetPosts(c *gin.Context) {
 		"prev_page": prev_page,
 		"next_page": next_page,
 	})
-
-	return
 }
 
 // <=============== GET /create ===============>
