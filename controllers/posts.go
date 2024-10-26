@@ -18,11 +18,37 @@ var invalidArgument = errors.New("invalid argument")
 
 // <=============== GET /posts ===============>
 func GetPosts(c *gin.Context) {
-	// TODO: add a page system so that we dont always return all posts
+	const PAGE_SIZE = 5
+
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		c.Redirect(http.StatusFound, "/posts")
+	}
+
+	var count int64 = 0
+	err = models.DB.
+		Table("posts").
+		Count(&count).
+		Error
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Internal Server Error")
+		c.Error(err)
+		return
+	}
+
+	// count / PAGE_SIZE rounded up
+	last_page := (int(count) + (PAGE_SIZE - 1)) / PAGE_SIZE
+
+	if page > last_page {
+		c.Redirect(http.StatusFound, fmt.Sprintf("/posts?page=%v", last_page))
+        return
+	}
 
 	var posts []models.Post
-	err := models.DB.
+	err = models.DB.
 		Order("created_at desc").
+		Offset(PAGE_SIZE * (page - 1)).
+		Limit(PAGE_SIZE).
 		Preload("Comments").
 		Find(&posts).
 		Error
@@ -32,8 +58,20 @@ func GetPosts(c *gin.Context) {
 		return
 	}
 
+	next_page := strconv.Itoa(page + 1)
+	if page+1 > last_page {
+		next_page = ""
+	}
+
+	prev_page := strconv.Itoa(page - 1)
+	if page-1 < 1 {
+		prev_page = ""
+	}
+
 	c.HTML(http.StatusOK, "posts.tmpl", gin.H{
-		"posts": posts,
+		"posts":     posts,
+		"prev_page": prev_page,
+		"next_page": next_page,
 	})
 
 	return
