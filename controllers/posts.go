@@ -23,6 +23,7 @@ func GetPosts(c *gin.Context) {
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
 		c.Redirect(http.StatusFound, "/posts")
+		return
 	}
 
 	var count int64 = 0
@@ -41,7 +42,7 @@ func GetPosts(c *gin.Context) {
 
 	if page > last_page {
 		c.Redirect(http.StatusFound, fmt.Sprintf("/posts?page=%v", last_page))
-        return
+		return
 	}
 
 	var posts []models.Post
