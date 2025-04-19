@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/4rneee/noah-updater/controllers"
-	"github.com/4rneee/noah-updater/middlewares"
-	"github.com/4rneee/noah-updater/models"
+	"github.com/4rneee/noah/controllers"
+	"github.com/4rneee/noah/middlewares"
+	"github.com/4rneee/noah/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"

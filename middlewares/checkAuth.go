@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/4rneee/noah-updater/models"
+	"github.com/4rneee/noah/models"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
