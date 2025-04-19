@@ -1,5 +1,5 @@
-# noah-updater
-Namensvorschläge sind willkommen!
+# noah
+Notes Of A Human. A minimalistic webapp to update your friends with simple blog posts.
 
 ## Running
 ```sh

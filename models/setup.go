@@ -8,7 +8,7 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	db, err := gorm.Open(sqlite.Open("noah-updater.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("noah.db"), &gorm.Config{})
 
 	if err != nil {
 		panic("Failed to connect to database!")

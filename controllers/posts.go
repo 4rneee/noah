@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/4rneee/noah-updater/models"
+	"github.com/4rneee/noah/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

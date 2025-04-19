@@ -1,4 +1,4 @@
-module github.com/4rneee/noah-updater
+module github.com/4rneee/noah
 
 go 1.23.1
 
