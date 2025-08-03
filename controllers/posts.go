@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+    "net/url"
+    "regexp"
 
 	"github.com/4rneee/noah/models"
 	"github.com/gin-gonic/gin"
@@ -39,6 +41,11 @@ func GetPosts(c *gin.Context) {
 
 	// count / PAGE_SIZE rounded up
 	last_page := (int(count) + (PAGE_SIZE - 1)) / PAGE_SIZE
+
+	// if there are no posts, correct last_page
+	if last_page == 0 {
+		last_page = 1
+	}
 
 	if page > last_page {
 		c.Redirect(http.StatusFound, fmt.Sprintf("/posts?page=%v", last_page))
@@ -85,6 +92,7 @@ func CreateHTML(c *gin.Context) {
 type PostInput struct {
 	Title   string `form:"title" binding:"required"`
 	Content string `form:"content" binding:"required"`
+	VideoLink string `form:"video_link"`
 }
 
 func CreatePost(c *gin.Context) {
@@ -125,11 +133,23 @@ func CreatePost(c *gin.Context) {
 		return
 	}
 
+
+	err = IsValidYouTubeEmbedLink(input.VideoLink)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
+			"error": err.Error(),
+
+		})
+		c.Error(err)
+		return
+	}
+
 	post := models.Post{
 		UserName: user.Name,
 		Title:    input.Title,
 		Content:  input.Content,
 		Images:   images,
+		EmbedVideo: input.VideoLink,
 	}
 
 	err = models.DB.
@@ -311,4 +331,30 @@ func get_post_with_comments(post *models.Post, str_id string) error {
 		}).
 		First(post).
 		Error
+}
+
+
+func IsValidYouTubeEmbedLink(rawURL string) (error) {
+    // 1. Check if the URL is in a valid format
+    parsedURL, err := url.ParseRequestURI(rawURL)
+    if err != nil {
+        return fmt.Errorf("Invalid URL format")
+    }
+
+    // 2. Check if the host is youtube.com
+    if parsedURL.Host != "www.youtube.com" && parsedURL.Host != "youtube.com" {
+        return fmt.Errorf("URL is not a YouTube domain")
+    }
+
+    // 3. Use a regular expression to match the /embed/VIDEO_ID pattern
+    re, err := regexp.Compile(`^/embed/([a-zA-Z0-9_-]{11})$`)
+	if err != nil {
+		return fmt.Errorf("URL is not a valid YouTube embed link")
+	}
+    matches := re.FindStringSubmatch(parsedURL.Path)
+    if len(matches) < 2 {
+        return fmt.Errorf("URL is not a valid YouTube embed link")
+    }
+
+    return nil
 }

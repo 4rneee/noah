@@ -15,4 +15,5 @@ type Post struct {
 	Content   string                      `json:"content"`
 	Images    datatypes.JSONSlice[string] `json:"images"`
 	Comments  []Comment                   `json:"comments" gorm:"foreignKey:PostID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	EmbedVideo string                     `json:"embed_video"`
 }
