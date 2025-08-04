@@ -101,6 +101,9 @@ func CreatePost(c *gin.Context) {
 	if err := c.ShouldBind(&input); err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
 			"error": "Invalid request",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -110,6 +113,9 @@ func CreatePost(c *gin.Context) {
 	if !ok {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
 			"error": "Internal Server Error",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		return
 	}
@@ -118,6 +124,9 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
 			"error": "Invalid request",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -128,6 +137,9 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
 			"error": "Internal Server Error",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -138,7 +150,9 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
 			"error": err.Error(),
-
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -159,6 +173,9 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
 			"error": "Internal Server Error",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return

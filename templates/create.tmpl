@@ -60,10 +60,10 @@
 
 			<form action="/create" method="POST", enctype="multipart/form-data">
 				<div class="row">
-					<input type="text" id="title" name="title" placeholder="Title" required>
+					<input type="text" id="title" name="title" placeholder="Title" value="{{.title}}" required>
 				</div>
 				<div class="row">
-					<textarea id="content" name="content" placeholder="Was los?" style="height:200px"></textarea>
+					<textarea id="content" name="content" placeholder="Was los?" style="height:200px">{{.content}}</textarea>
 				</div>
 				<div class="row">
                     <label for="images">Images:</label>
@@ -72,7 +72,7 @@
                 <br></br>
                 <div class="row">
                     <label for="video_link">Embed Video Link:</label>
-                    <input type="text" id="video_link" name="video_link" placeholder="Embed Video Link">
+                    <input type="text" id="video_link" name="video_link" placeholder="Embed Video Link" value="{{.video_link}}">
                 </div>
                 <br></br>
 				<div class="row">
