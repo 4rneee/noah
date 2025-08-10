@@ -142,9 +142,20 @@
         </div>
 
         {{ if .EmbedVideo }}
-            <div class="video-box">
-                <iframe width="560" height="315" src="{{ .EmbedVideo }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
+            <script>
+                document.write(`
+                    <div class="video-box">
+                        <iframe width="560" height="315" src="{{ .EmbedVideo }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                `);
+            </script>
+            <noscript>
+                <div class="video-box">
+                    <a href="{{ .EmbedVideo }}" target="_blank" rel="noopener noreferrer">
+                        <button>Open Video</button>
+                    </a>
+                </div>
+            </noscript>
         {{ end }}
 
         <h4 style="text-align:center">Comments</h4>
