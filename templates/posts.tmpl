@@ -58,6 +58,11 @@
                 color: #000;
                 text-decoration: none;
             }
+
+
+            .video-box {
+				padding: 20px 0px 0px 0px;
+			}
 		</style>
 	</head>
 	<body>
@@ -91,6 +96,11 @@
                         <a href="/uploads/{{ . }}" target="_blank">
                             <img src="/uploads/{{ . }}">
                         </a>
+                    </div>
+                {{ end }}
+                {{ if .EmbedVideo }}
+                    <div class="video-box">
+                        <iframe width="560" height="315" src="{{ .EmbedVideo }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                 {{ end }}
 			</div>
