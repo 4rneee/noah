@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-    "net/url"
     "regexp"
 
 	"github.com/4rneee/noah/models"
@@ -146,7 +145,7 @@ func CreatePost(c *gin.Context) {
 	}
 
 
-	err = IsValidYouTubeEmbedLink(input.VideoLink)
+	err, embed_link := getYouTubeEmbedLink(input.VideoLink)
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
 			"error": err.Error(),
@@ -163,7 +162,7 @@ func CreatePost(c *gin.Context) {
 		Title:    input.Title,
 		Content:  input.Content,
 		Images:   images,
-		EmbedVideo: input.VideoLink,
+		EmbedVideo: embed_link,
 	}
 
 	err = models.DB.
@@ -351,27 +350,23 @@ func get_post_with_comments(post *models.Post, str_id string) error {
 }
 
 
-func IsValidYouTubeEmbedLink(rawURL string) (error) {
-    // 1. Check if the URL is in a valid format
-    parsedURL, err := url.ParseRequestURI(rawURL)
-    if err != nil {
-        return fmt.Errorf("Invalid URL format")
-    }
-
-    // 2. Check if the host is youtube.com
-    if parsedURL.Host != "www.youtube.com" && parsedURL.Host != "youtube.com" {
-        return fmt.Errorf("URL is not a YouTube domain")
-    }
-
-    // 3. Use a regular expression to match the /embed/VIDEO_ID pattern
-    re, err := regexp.Compile(`^/embed/([a-zA-Z0-9_-]{11})$`)
+func getYouTubeEmbedLink(rawURL string) (error, string) {
+    re, err := regexp.Compile(`(?:https?://)?(?:(?:www\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})(?:&.*)?|(?:(?:youtu\.be|(?:www\.)?youtube\.com/embed)/([a-zA-Z0-9_-]{11})(?:\?.*)?)(?:&.*)?)`)
 	if err != nil {
-		return fmt.Errorf("URL is not a valid YouTube embed link")
+		return fmt.Errorf("Internal server error"), ""
 	}
-    matches := re.FindStringSubmatch(parsedURL.Path)
-    if len(matches) < 2 {
-        return fmt.Errorf("URL is not a valid YouTube embed link")
+    match := re.FindStringSubmatch(rawURL)
+    if len(match) != 3 {
+        return fmt.Errorf("URL is not a valid YouTube link"), ""
     }
 
-    return nil
+	video_id := match[1]
+	if video_id == "" {
+		video_id = match[2]
+	}
+	if video_id == "" {
+        return fmt.Errorf("URL is not a valid YouTube link"), ""
+	}
+
+    return nil, fmt.Sprintf("https://www.youtube.com/embed/%s", video_id)
 }
