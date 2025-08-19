@@ -351,6 +351,11 @@ func get_post_with_comments(post *models.Post, str_id string) error {
 
 
 func getYouTubeEmbedLink(rawURL string) (error, string) {
+	// regex to match youtube links in the following forms:
+	// https://www.youtube.com/watch?v=<ID>
+	// https://youtu.be/<ID>?feature=shared
+	// https://www.youtube.com/embed/<ID>
+	// the https:// and www. are optional and additional query parameters are ignored
     re, err := regexp.Compile(`(?:https?://)?(?:(?:www\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})(?:&.*)?|(?:(?:youtu\.be|(?:www\.)?youtube\.com/embed)/([a-zA-Z0-9_-]{11})(?:\?.*)?)(?:&.*)?)`)
 	if err != nil {
 		return fmt.Errorf("Internal server error"), ""
