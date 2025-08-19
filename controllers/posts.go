@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+    "regexp"
 
 	"github.com/4rneee/noah/models"
 	"github.com/gin-gonic/gin"
@@ -39,6 +40,11 @@ func GetPosts(c *gin.Context) {
 
 	// count / PAGE_SIZE rounded up
 	last_page := (int(count) + (PAGE_SIZE - 1)) / PAGE_SIZE
+
+	// if there are no posts, correct last_page
+	if last_page == 0 {
+		last_page = 1
+	}
 
 	if page > last_page {
 		c.Redirect(http.StatusFound, fmt.Sprintf("/posts?page=%v", last_page))
@@ -85,6 +91,7 @@ func CreateHTML(c *gin.Context) {
 type PostInput struct {
 	Title   string `form:"title" binding:"required"`
 	Content string `form:"content" binding:"required"`
+	VideoLink string `form:"video_link"`
 }
 
 func CreatePost(c *gin.Context) {
@@ -93,6 +100,9 @@ func CreatePost(c *gin.Context) {
 	if err := c.ShouldBind(&input); err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
 			"error": "Invalid request",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -102,6 +112,9 @@ func CreatePost(c *gin.Context) {
 	if !ok {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
 			"error": "Internal Server Error",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		return
 	}
@@ -110,6 +123,9 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
 			"error": "Invalid request",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -120,6 +136,22 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
 			"error": "Internal Server Error",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
+		})
+		c.Error(err)
+		return
+	}
+
+
+	err, embed_link := getYouTubeEmbedLink(input.VideoLink)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
+			"error": err.Error(),
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -130,6 +162,7 @@ func CreatePost(c *gin.Context) {
 		Title:    input.Title,
 		Content:  input.Content,
 		Images:   images,
+		EmbedVideo: embed_link,
 	}
 
 	err = models.DB.
@@ -139,6 +172,9 @@ func CreatePost(c *gin.Context) {
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
 			"error": "Internal Server Error",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
 		})
 		c.Error(err)
 		return
@@ -311,4 +347,31 @@ func get_post_with_comments(post *models.Post, str_id string) error {
 		}).
 		First(post).
 		Error
+}
+
+
+func getYouTubeEmbedLink(rawURL string) (error, string) {
+	// regex to match youtube links in the following forms:
+	// https://www.youtube.com/watch?v=<ID>
+	// https://youtu.be/<ID>?feature=shared
+	// https://www.youtube.com/embed/<ID>
+	// the https:// and www. are optional and additional query parameters are ignored
+    re, err := regexp.Compile(`(?:https?://)?(?:(?:www\.)?youtube\.com/watch\?.*v=([a-zA-Z0-9_-]{11})(?:&.*)?|(?:(?:youtu\.be|(?:www\.)?youtube\.com/embed)/([a-zA-Z0-9_-]{11})(?:\?.*)?)(?:&.*)?)`)
+	if err != nil {
+		return fmt.Errorf("Internal server error"), ""
+	}
+    match := re.FindStringSubmatch(rawURL)
+    if len(match) != 3 {
+        return fmt.Errorf("URL is not a valid YouTube link"), ""
+    }
+
+	video_id := match[1]
+	if video_id == "" {
+		video_id = match[2]
+	}
+	if video_id == "" {
+        return fmt.Errorf("URL is not a valid YouTube link"), ""
+	}
+
+    return nil, fmt.Sprintf("https://www.youtube.com/embed/%s", video_id)
 }

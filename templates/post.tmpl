@@ -63,7 +63,6 @@
                 max-height: 65vh;
             }
 
-
 			textarea {
 				width: 100%;
 				padding: 10px;
@@ -127,7 +126,13 @@
                     </a>
                 </div>
             {{ end }}
+            {{ if .EmbedVideo }}
+                <iframe width="560" height="315" src="{{ .EmbedVideo }}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            {{ end }}
+
         </div>
+
+
         <h4 style="text-align:center">Comments</h4>
         {{ range .Comments }}
             <div class="comment-box">
