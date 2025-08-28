@@ -145,16 +145,19 @@ func CreatePost(c *gin.Context) {
 	}
 
 
-	err, embed_link := getYouTubeEmbedLink(input.VideoLink)
-	if err != nil {
-		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
-			"error": err.Error(),
-			"title": input.Title,
-			"content": input.Content,
-			"video_link": input.VideoLink,
-		})
-		c.Error(err)
-		return
+	embed_link := strings.TrimSpace(input.VideoLink)
+	if embed_link != "" {
+		err, embed_link = getYouTubeEmbedLink(input.VideoLink)
+		if err != nil {
+			c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
+				"error": err.Error(),
+				"title": input.Title,
+				"content": input.Content,
+				"video_link": input.VideoLink,
+			})
+			c.Error(err)
+			return
+		}
 	}
 
 	post := models.Post{
