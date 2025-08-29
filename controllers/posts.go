@@ -229,7 +229,6 @@ func GetPost(c *gin.Context) {
 	user, ok := get_current_user(c)
 	if !ok {
 		c.String(http.StatusInternalServerError, "Internal Server Error")
-		c.Error(err)
 		return
 	}
 	redaction_date := get_redaction_date(&user)
