@@ -77,7 +77,7 @@ func GetPosts(c *gin.Context) {
 
 	for i := range posts {
 		if redaction_date.Compare(posts[i].CreatedAt) < 0 {
-			redact_post(&posts[i])
+			posts[i].Redact()
 		}
 	}
 
@@ -429,11 +429,4 @@ func get_redaction_date(user *models.User) time.Time {
 	}
 
 	return latest_post.CreatedAt.Add(time.Duration(window) * time.Hour * 24)
-}
-
-func redact_post(post *models.Post) {
-	post.Title = "REDACTED"
-	post.Content = "Your latest post is not new enough to see this post."
-	post.Images = []string{}
-	post.EmbedVideo = ""
 }

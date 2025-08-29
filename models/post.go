@@ -17,3 +17,10 @@ type Post struct {
 	Comments  []Comment                   `json:"comments" gorm:"foreignKey:PostID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	EmbedVideo string                     `json:"embed_video"`
 }
+
+func (post *Post) Redact() {
+	post.Title = "REDACTED"
+	post.Content = "Your latest post is not new enough to see this post."
+	post.Images = []string{}
+	post.EmbedVideo = ""
+}
