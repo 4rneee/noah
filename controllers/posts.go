@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -407,11 +408,17 @@ func getYouTubeEmbedLink(rawURL string) (error, string) {
     return nil, fmt.Sprintf("https://www.youtube.com/embed/%s", video_id)
 }
 
-// Returns the date after which posts should get redacted i.e. the latest post + X
+// Returns the date after which posts should get redacted i.e. the latest post + VISIBILITY_WINDOW
 // If no post exists it returns time.Time{} i.e. January 1, year 1, 00:00
 func get_redaction_date(user *models.User) time.Time {
+	window, err := strconv.Atoi(os.Getenv("VISIBILITY_WINDOW"))
+	if err != nil || window < 0 {
+		// negative or non-numeric window values make all posts always visible
+		return time.Now()
+	}
+
 	var latest_post models.Post
-	err := models.DB.
+	err = models.DB.
 		Table("posts").
 		Where("user_name = ?", user.Name).
 		Order("created_at desc").
@@ -420,8 +427,8 @@ func get_redaction_date(user *models.User) time.Time {
 	if err != nil {
 		return time.Time{}
 	}
-	// TODO: set actual value (ideally through .env)
-	return latest_post.CreatedAt.Add(time.Minute * 3)
+
+	return latest_post.CreatedAt.Add(time.Duration(window) * time.Hour * 24)
 }
 
 func redact_post(post *models.Post) {
