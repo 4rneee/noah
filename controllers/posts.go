@@ -106,7 +106,7 @@ func CreateHTML(c *gin.Context) {
 // <=============== POST /create ===============>
 type PostInput struct {
 	Title   string `form:"title" binding:"required"`
-	Content string `form:"content" binding:"required"`
+	Content string `form:"content"`
 	VideoLink string `form:"video_link"`
 }
 
@@ -115,7 +115,7 @@ func CreatePost(c *gin.Context) {
 
 	if err := c.ShouldBind(&input); err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
-			"error": "Invalid request",
+			"error": "Invalid request\nNote: Images must be reselected",
 			"title": input.Title,
 			"content": input.Content,
 			"video_link": input.VideoLink,
@@ -127,7 +127,7 @@ func CreatePost(c *gin.Context) {
 	user, ok := get_current_user(c)
 	if !ok {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
-			"error": "Internal Server Error",
+			"error": "Internal Server Error\nNote: Images must be reselected",
 			"title": input.Title,
 			"content": input.Content,
 			"video_link": input.VideoLink,
@@ -138,7 +138,7 @@ func CreatePost(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
 		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
-			"error": "Invalid request",
+			"error": "Invalid request\nNote: Images must be reselected",
 			"title": input.Title,
 			"content": input.Content,
 			"video_link": input.VideoLink,
@@ -146,27 +146,13 @@ func CreatePost(c *gin.Context) {
 		c.Error(err)
 		return
 	}
-
-	files := form.File["images"]
-	images, err := store_files(c, files)
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
-			"error": "Internal Server Error",
-			"title": input.Title,
-			"content": input.Content,
-			"video_link": input.VideoLink,
-		})
-		c.Error(err)
-		return
-	}
-
 
 	embed_link := strings.TrimSpace(input.VideoLink)
 	if embed_link != "" {
 		err, embed_link = getYouTubeEmbedLink(input.VideoLink)
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
-				"error": err.Error(),
+				"error": fmt.Sprintf("%v\nNote: Images must be reselected", err.Error()),
 				"title": input.Title,
 				"content": input.Content,
 				"video_link": input.VideoLink,
@@ -174,6 +160,29 @@ func CreatePost(c *gin.Context) {
 			c.Error(err)
 			return
 		}
+	}
+
+	files := form.File["images"]
+	images, err := store_files(c, files)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
+			"error": "Internal Server Error\nNote: Images must be reselected",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
+		})
+		c.Error(err)
+		return
+	}
+
+	if input.Content == "" && embed_link == "" && len(files) == 0 {
+		c.HTML(http.StatusBadRequest, "create.tmpl", gin.H{
+			"error": "You must include either text, an image, or a YouTube link",
+			"title": input.Title,
+			"content": input.Content,
+			"video_link": input.VideoLink,
+		})
+		return
 	}
 
 	post := models.Post{
@@ -190,7 +199,7 @@ func CreatePost(c *gin.Context) {
 
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "create.tmpl", gin.H{
-			"error": "Internal Server Error",
+			"error": "Internal Server Error\nNote: Images must be reselected",
 			"title": input.Title,
 			"content": input.Content,
 			"video_link": input.VideoLink,
