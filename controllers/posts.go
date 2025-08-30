@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
-    "regexp"
 
 	"github.com/4rneee/noah/models"
 	"github.com/gin-gonic/gin"
@@ -63,6 +65,20 @@ func GetPosts(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Internal Server Error")
 		c.Error(err)
 		return
+	}
+
+
+	user, ok := get_current_user(c)
+	if !ok {
+		c.String(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	redaction_date := get_redaction_date(&user)
+
+	for i := range posts {
+		if redaction_date.Compare(posts[i].CreatedAt) < 0 {
+			posts[i].Redact()
+		}
 	}
 
 	next_page := strconv.Itoa(page + 1)
@@ -209,6 +225,18 @@ func GetPost(c *gin.Context) {
 		c.Error(err)
 		return
 	}
+
+	user, ok := get_current_user(c)
+	if !ok {
+		c.String(http.StatusInternalServerError, "Internal Server Error")
+		return
+	}
+	redaction_date := get_redaction_date(&user)
+	if redaction_date.Compare(post.CreatedAt) < 0 {
+		c.Redirect(http.StatusFound, "/create")
+		return
+	}
+
 
 	c.HTML(http.StatusOK, "post.tmpl", gin.H{
 		"post": post,
@@ -377,4 +405,27 @@ func getYouTubeEmbedLink(rawURL string) (error, string) {
 	}
 
     return nil, fmt.Sprintf("https://www.youtube.com/embed/%s", video_id)
+}
+
+// Returns the date after which posts should get redacted i.e. the latest post + VISIBILITY_WINDOW
+// If no post exists it returns time.Time{} i.e. January 1, year 1, 00:00
+func get_redaction_date(user *models.User) time.Time {
+	window, err := strconv.Atoi(os.Getenv("VISIBILITY_WINDOW"))
+	if err != nil || window < 0 {
+		// negative or non-numeric window values make all posts always visible
+		return time.Now()
+	}
+
+	var latest_post models.Post
+	err = models.DB.
+		Table("posts").
+		Where("user_name = ?", user.Name).
+		Order("created_at desc").
+		First(&latest_post).
+		Error
+	if err != nil {
+		return time.Time{}
+	}
+
+	return latest_post.CreatedAt.Add(time.Duration(window) * time.Hour * 24)
 }
