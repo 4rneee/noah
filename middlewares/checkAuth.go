@@ -18,12 +18,14 @@ func CheckAuth(c *gin.Context) {
 
 	if t == nil {
 		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
 		return
 	}
 
 	token_str, ok := t.(string)
 	if !ok {
 		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
 		return
 	}
 
@@ -37,17 +39,20 @@ func CheckAuth(c *gin.Context) {
 	if err != nil || !token.Valid {
 		c.Redirect(http.StatusFound, "/login")
 		c.Error(err)
+		c.Abort()
 		return
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
 		return
 	}
 
 	if float64(time.Now().Unix()) > claims["exp"].(float64) {
 		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
 		return
 	}
 
@@ -59,6 +64,7 @@ func CheckAuth(c *gin.Context) {
 		Error
 	if err != nil {
 		c.Redirect(http.StatusFound, "/login")
+		c.Abort()
 		return
 	}
 
