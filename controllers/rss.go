@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/4rneee/noah/models"
 	"github.com/gin-gonic/gin"
 )
+
+const RFC822_4Y = "02 Jan 2006 15:04 MST" // https://validator.w3.org/feed/docs/warning/ProblematicalRFC822Date.html
 
 type RSS struct {
 	XMLName xml.Name `xml:"rss"`
@@ -77,7 +78,7 @@ func Feed(c *gin.Context) {
 				Link:        link,
 				Description: fmt.Sprintf("%s by %s", post.Title, post.UserName),
 				Guid:        link,
-				PubDate:     post.CreatedAt.Format(time.RFC822),
+				PubDate:     post.CreatedAt.Format(RFC822_4Y),
 			})
 	}
 
