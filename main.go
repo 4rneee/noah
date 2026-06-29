@@ -60,5 +60,7 @@ func main() {
 	r.GET("/post/:id", middlewares.CheckAuth, controllers.GetPost)
 	r.POST("/post/:id", middlewares.CheckAuth, controllers.PostComment)
 
+	r.GET("/feed.xml", middlewares.BasicAuth, controllers.Feed)
+
 	r.Run() // automatically uses the 'PORT' env variable
 }
