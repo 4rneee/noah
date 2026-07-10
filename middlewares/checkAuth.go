@@ -10,6 +10,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func CheckAuth(c *gin.Context) {
@@ -65,6 +67,46 @@ func CheckAuth(c *gin.Context) {
 	if err != nil {
 		c.Redirect(http.StatusFound, "/login")
 		c.Abort()
+		return
+	}
+
+	c.Set("current_user", user)
+
+	c.Next()
+}
+
+func BasicAuth(c *gin.Context) {
+	username, password, ok := c.Request.BasicAuth()
+
+	if !ok {
+		c.Header("WWW-Authenticate",  "Basic realm=\"Authorization Required\"")
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	var user models.User
+	err := models.DB.
+		Table("users").
+		Where("name = ?", username).
+		First(&user).
+		Error
+
+	if err == gorm.ErrRecordNotFound {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	} else if err != nil {
+		c.Error(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword(user.Password, []byte(password))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	} else if err != nil {
+		c.Error(err)
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
